@@ -49,7 +49,7 @@ const priorityNames: Record<string, string> = {
   Urgent: "Срочный",
 };
 
-function toDateTimeLocal(
+function toDateInput(
   value: string | null,
 ): string {
   if (!value) {
@@ -67,7 +67,7 @@ function toDateTimeLocal(
       date.getTimezoneOffset() * 60_000,
   )
     .toISOString()
-    .slice(0, 16);
+    .slice(0, 10);
 }
 
 export function TaskEditModal({
@@ -333,8 +333,8 @@ export function TaskEditModal({
             Срок
             <input
               name="due_at"
-              type="datetime-local"
-              defaultValue={toDateTimeLocal(
+              type="date"
+              defaultValue={toDateInput(
                 task.due_at,
               )}
             />

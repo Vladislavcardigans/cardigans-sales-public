@@ -1,5 +1,4 @@
-import { DatabaseStatus } from "@/components/ui/DatabaseStatus";
-import { SalesSidebar } from "@/components/layout/SalesSidebar";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Link from "next/link";
 
 import { createDealAction } from "./actions";
@@ -70,19 +69,19 @@ export default async function DealsPage() {
   ]);
 
   return (
-    <div className="appShell">
-      <SalesSidebar activeSection="deals" />
+    <AppLayout
+      activeSection="deals"
+      breadcrumbs={[
+        {
+          label: "Sales OS",
+          href: "/",
+        },
+        {
+          label: "Сделки",
+        },
+      ]}
+    >
 
-      <main className="mainContent">
-        <header className="topbar">
-          <div className="breadcrumbs">
-            <span>Продажи</span>
-            <strong>/</strong>
-            <span>Сделки</span>
-          </div>
-
-          <DatabaseStatus />
-        </header>
 
         <section className="pageHeader">
           <div>
@@ -587,7 +586,6 @@ export default async function DealsPage() {
 
           )}
         </section>
-      </main>
-    </div>
+      </AppLayout>
   );
 }

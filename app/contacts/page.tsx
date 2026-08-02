@@ -1,5 +1,4 @@
-import { DatabaseStatus } from "@/components/ui/DatabaseStatus";
-import { SalesSidebar } from "@/components/layout/SalesSidebar";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Link from "next/link";
 
 import { createContactAction } from "./actions";
@@ -37,19 +36,18 @@ export default async function ContactsPage() {
     ]);
 
   return (
-    <div className="appShell">
-      <SalesSidebar activeSection="contacts" />
-
-      <main className="mainContent">
-        <header className="topbar">
-          <div className="breadcrumbs">
-            <span>Продажи</span>
-            <strong>/</strong>
-            <span>Контакты</span>
-          </div>
-
-          <DatabaseStatus />
-        </header>
+    <AppLayout
+      activeSection="contacts"
+      breadcrumbs={[
+        {
+          label: "Sales OS",
+          href: "/",
+        },
+        {
+          label: "Контакты",
+        },
+      ]}
+    >
 
         <section className="pageHeader">
           <div>
@@ -473,7 +471,6 @@ export default async function ContactsPage() {
             )}
           </aside>
         </section>
-      </main>
-    </div>
+    </AppLayout>
   );
 }

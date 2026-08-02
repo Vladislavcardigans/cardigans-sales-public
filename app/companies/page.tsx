@@ -1,5 +1,4 @@
-import { DatabaseStatus } from "@/components/ui/DatabaseStatus";
-import { SalesSidebar } from "@/components/layout/SalesSidebar";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Link from "next/link";
 import {
   countCompanies,
@@ -28,19 +27,18 @@ export default async function CompaniesPage() {
   ]);
 
   return (
-    <div className="appShell">
-      <SalesSidebar activeSection="companies" />
-
-      <main className="mainContent">
-        <header className="topbar">
-          <div className="breadcrumbs">
-            <span>Продажи</span>
-            <strong>/</strong>
-            <span>Компании</span>
-          </div>
-
-          <DatabaseStatus />
-        </header>
+    <AppLayout
+      activeSection="companies"
+      breadcrumbs={[
+        {
+          label: "Sales OS",
+          href: "/",
+        },
+        {
+          label: "Компании",
+        },
+      ]}
+    >
 
         <section className="pageHeader">
           <div>
@@ -250,7 +248,6 @@ export default async function CompaniesPage() {
             </form>
           </aside>
         </section>
-      </main>
-    </div>
+    </AppLayout>
   );
 }

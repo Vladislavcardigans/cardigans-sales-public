@@ -59,7 +59,7 @@ export const salesNavigation: SalesNavigationItem[] = [
   {
     icon: "⚙",
     label: "Настройки",
-    href: "#",
+    href: "/settings/users",
     section: "settings",
   },
 ];

@@ -494,7 +494,7 @@ export default async function TasksPage() {
                   Срок
                   <input
                     name="due_at"
-                    type="datetime-local"
+                    type="date"
                   />
                 </label>
 

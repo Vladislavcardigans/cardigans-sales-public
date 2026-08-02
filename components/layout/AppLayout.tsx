@@ -1,4 +1,12 @@
 import Link from "next/link";
+
+import {
+  NotificationBell,
+} from "@/components/notifications/NotificationBell";
+
+import {
+  getNotificationSummary,
+} from "@/lib/repositories/notification.repository";
 import { redirect } from "next/navigation";
 
 import type {
@@ -14,6 +22,7 @@ import {
 } from "@/components/ui/DatabaseStatus";
 
 import {
+  hasPermission,
   getCurrentSession,
 } from "@/modules/auth";
 
@@ -49,6 +58,21 @@ export async function AppLayout({
   if (!session) {
     redirect("/login");
   }
+
+  const [
+    canReadTasks,
+    canReadActivities,
+  ] = await Promise.all([
+    hasPermission("task.read"),
+    hasPermission("activity.read"),
+  ]);
+
+  const notificationSummary =
+    await getNotificationSummary({
+      tasks: canReadTasks,
+      activities: canReadActivities,
+    });
+
 
   return (
     <div className="appShell">
@@ -88,6 +112,9 @@ export async function AppLayout({
           </div>
 
           <div className="appTopbarRight">
+            <NotificationBell
+              summary={notificationSummary}
+            />
             <form
               action="/search"
               method="get"

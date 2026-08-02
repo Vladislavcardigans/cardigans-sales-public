@@ -4329,3 +4329,490 @@ h1 {
     flex-direction: column;
   }
 }
+
+/* Notifications */
+
+.notificationControl {
+  position: relative;
+}
+
+.notificationBell {
+  position: relative;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #d0d5dd;
+  border-radius: 11px;
+  background: #ffffff;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.notificationBell:hover {
+  background: #f8fafc;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -6px;
+  right: -7px;
+  display: grid;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  place-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #d92d20;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 50;
+  width: min(410px, calc(100vw - 32px));
+  max-height: min(620px, calc(100vh - 90px));
+  border: 1px solid #eaecf0;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 24px 64px rgba(16, 24, 40, 0.18);
+  overflow: hidden;
+}
+
+.notificationHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.notificationHeader div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.notificationHeader small {
+  color: #667085;
+}
+
+.notificationHeader > span {
+  display: grid;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 7px;
+  place-items: center;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #344054;
+  font-weight: 800;
+}
+
+.notificationBody {
+  max-height: 480px;
+  padding: 0.35rem 0;
+  overflow-y: auto;
+}
+
+.notificationSection h3 {
+  margin: 0;
+  padding: 0.75rem 1.1rem 0.35rem;
+  color: #667085;
+  font-size: 0.75rem;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.notificationItems {
+  display: grid;
+}
+
+.notificationItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.notificationItem:hover {
+  background: #f9fafb;
+}
+
+.notificationMarker {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.notificationMarker-overdue-task {
+  background: #d92d20;
+}
+
+.notificationMarker-today-task {
+  background: #f79009;
+}
+
+.notificationMarker-today-activity {
+  background: #2e90fa;
+}
+
+.notificationItemContent {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.notificationItemContent strong,
+.notificationItemContent small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notificationItemContent small,
+.notificationItem time {
+  color: #667085;
+  font-size: 0.76rem;
+}
+
+.notificationItem time {
+  flex: 0 0 auto;
+}
+
+.notificationEmpty {
+  padding: 2rem 1rem;
+  color: #667085;
+  text-align: center;
+}
+
+.notificationFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border-top: 1px solid #eaecf0;
+  background: #f9fafb;
+}
+
+.notificationFooter a {
+  color: #344054;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .notificationDropdown {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}
+
+/* Users administration */
+
+.usersPage {
+  padding: 2rem;
+}
+
+.usersPageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.usersPageHeader h1 {
+  margin: 0.2rem 0 0.45rem;
+}
+
+.usersPageHeader p {
+  margin: 0;
+  color: #98a2b3;
+}
+
+.usersCount {
+  display: grid;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 0.75rem;
+  place-items: center;
+  border: 1px solid #344054;
+  border-radius: 12px;
+  background: #101828;
+  font-weight: 800;
+}
+
+.usersWorkspace {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) minmax(300px, 380px);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.usersList {
+  display: grid;
+  gap: 1rem;
+}
+
+.userCard,
+.createUserPanel {
+  border: 1px solid #253248;
+  border-radius: 14px;
+  background: #111b2b;
+}
+
+.userCard {
+  padding: 1.1rem;
+}
+
+.userCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.userIdentity {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.userAvatar {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  background: #5746c7;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.userIdentity h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
+
+.userIdentity p {
+  margin: 0;
+  color: #98a2b3;
+  overflow-wrap: anywhere;
+}
+
+.userStatus {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.userStatus-Active {
+  background: rgba(18, 183, 106, 0.14);
+  color: #6ce9a6;
+}
+
+.userStatus-Disabled {
+  background: rgba(240, 68, 56, 0.14);
+  color: #fda29b;
+}
+
+.userStatus-Invited {
+  background: rgba(247, 144, 9, 0.14);
+  color: #fec84b;
+}
+
+.userMeta {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.userMeta div {
+  min-width: 0;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: #0c1524;
+}
+
+.userMeta dt {
+  margin-bottom: 0.25rem;
+  color: #667085;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.userMeta dd {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userActionsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.userInlineForm,
+.createUserForm {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.userInlineForm {
+  padding: 0.85rem;
+  border: 1px solid #253248;
+  border-radius: 11px;
+}
+
+.userInlineForm label,
+.createUserForm label {
+  display: grid;
+  gap: 0.4rem;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.userInlineForm input,
+.userInlineForm select,
+.createUserForm input,
+.createUserForm select {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #344054;
+  border-radius: 9px;
+  background: #0b1423;
+  color: #f8fafc;
+  font: inherit;
+}
+
+.userInlineForm button,
+.createUserForm button,
+.userCardFooter button {
+  min-height: 40px;
+  padding: 0.65rem 0.8rem;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.userInlineForm button,
+.createUserForm button {
+  border: 1px solid #6957e8;
+  background: #6957e8;
+  color: #ffffff;
+}
+
+.userInlineForm button:disabled {
+  border-color: #344054;
+  background: #344054;
+  color: #98a2b3;
+  cursor: not-allowed;
+}
+
+.userCardFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #253248;
+}
+
+.userCardFooter small {
+  color: #667085;
+}
+
+.userDisableButton {
+  border: 1px solid #f04438;
+  background: transparent;
+  color: #fda29b;
+}
+
+.userEnableButton {
+  border: 1px solid #12b76a;
+  background: transparent;
+  color: #6ce9a6;
+}
+
+.createUserPanel {
+  position: sticky;
+  top: 1rem;
+  padding: 1.1rem;
+}
+
+.createUserHeader {
+  margin-bottom: 1rem;
+}
+
+.createUserHeader h2 {
+  margin: 0.2rem 0 0.4rem;
+}
+
+.createUserHeader p {
+  margin: 0;
+  color: #98a2b3;
+}
+
+.usersEmpty {
+  padding: 2rem;
+  border: 1px dashed #344054;
+  border-radius: 14px;
+  color: #98a2b3;
+  text-align: center;
+}
+
+@media (max-width: 1050px) {
+  .usersWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .createUserPanel {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .usersPage {
+    padding: 1rem;
+  }
+
+  .userMeta,
+  .userActionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .userCardHeader {
+    flex-direction: column;
+  }
+}
