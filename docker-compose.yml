@@ -1,0 +1,18 @@
+services:
+  sales:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cardigans-sales
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - cardigans-internal
+
+networks:
+  cardigans-internal:
+    external: true
+    name: cardigans_default
