@@ -31,6 +31,7 @@ export const permissionCodes = [
   "task.read",
   "task.create",
   "task.complete",
+  "task.update",
 
   "analytics.read",
 

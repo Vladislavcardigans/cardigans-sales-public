@@ -1,0 +1,196 @@
+.editButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 36px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #d5d9df;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #26313f;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.editButton:hover {
+  background: #f5f7fa;
+  border-color: #aeb6c1;
+  transform: translateY(-1px);
+}
+
+.dialog {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #182230;
+  box-shadow:
+    0 24px 80px rgba(15, 23, 42, 0.28);
+  overflow: auto;
+}
+
+.dialog::backdrop {
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.modalHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.4rem;
+  border-bottom: 1px solid #e7eaf0;
+  background: #ffffff;
+}
+
+.modalHeader h2 {
+  margin: 0.15rem 0 0;
+  font-size: 1.3rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #697586;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.closeButton {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  background: #f2f4f7;
+  color: #344054;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.4rem;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: #344054;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  padding: 0.7rem 0.75rem;
+  background: #ffffff;
+  color: #101828;
+  font: inherit;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+  border-color: #7f8ea3;
+  outline: 3px solid rgba(127, 142, 163, 0.16);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  padding-top: 0.4rem;
+}
+
+.cancelButton,
+.saveButton {
+  min-height: 40px;
+  padding: 0.6rem 1rem;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancelButton {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+}
+
+.saveButton {
+  border: 1px solid #1d2939;
+  background: #1d2939;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidth,
+  .actions {
+    grid-column: 1;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .saveButton {
+    width: 100%;
+  }
+}
+
+.deleteForm {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 1.4rem 1.4rem;
+}
+
+.deleteButton {
+  min-height: 38px;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid #fda29b;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #b42318;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  border-color: #f04438;
+  background: #fef3f2;
+}

@@ -66,6 +66,23 @@ export type CreateTaskInput = {
   ownerName: string | null;
 };
 
+
+export type UpdateTaskInput = {
+  companyId: string;
+  contactId: string | null;
+  dealId: string | null;
+  activityId: string | null;
+
+  title: string;
+  description: string | null;
+
+  status: TaskStatus;
+  priority: TaskPriority;
+
+  dueAt: string | null;
+  ownerName: string | null;
+};
+
 export type TaskOption = {
   id: string;
   company_id?: string;

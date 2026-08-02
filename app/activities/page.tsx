@@ -445,8 +445,9 @@ export default async function ActivitiesPage() {
             ))}
           </section>
 
-          <aside className="createPanel">
-            <div className="formHeader">
+          {canCreateActivities && (
+            <aside className="createPanel">
+              <div className="formHeader">
               <div className="formIcon">＋</div>
 
               <div>
@@ -677,7 +678,8 @@ export default async function ActivitiesPage() {
                 </button>
               </form>
             )}
-          </aside>
+            </aside>
+          )}
         </section>
       </main>
     </div>

@@ -1,11 +1,14 @@
 "use server";
+import { requirePermission } from "@/modules/auth";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { getDb } from "@/lib/db";
 
 import {
   createTask,
+  updateTask,
   isTaskPriority,
   isTaskStatus,
 } from "@/lib/repositories/task.repository";
@@ -40,6 +43,8 @@ function optionalText(
 export async function createTaskAction(
   formData: FormData,
 ): Promise<void> {
+  await requirePermission("task.create");
+
   const companyId = requiredText(
     formData,
     "company_id",
@@ -102,9 +107,100 @@ export async function createTaskAction(
   );
 }
 
+export async function updateTaskAction(
+  taskId: string,
+  formData: FormData,
+): Promise<void> {
+  await requirePermission("task.update");
+
+  const normalizedTaskId = taskId.trim();
+
+  if (!normalizedTaskId) {
+    throw new Error(
+      "Не указан идентификатор задачи.",
+    );
+  }
+
+  const companyId = requiredText(
+    formData,
+    "company_id",
+    "Компания",
+  );
+
+  const title = requiredText(
+    formData,
+    "title",
+    "Название задачи",
+  );
+
+  const statusValue = requiredText(
+    formData,
+    "status",
+    "Статус",
+  );
+
+  if (!isTaskStatus(statusValue)) {
+    throw new Error(
+      "Указан неизвестный статус задачи.",
+    );
+  }
+
+  const priorityValue = requiredText(
+    formData,
+    "priority",
+    "Приоритет",
+  );
+
+  if (!isTaskPriority(priorityValue)) {
+    throw new Error(
+      "Указан неизвестный приоритет.",
+    );
+  }
+
+  const task = await updateTask(
+    normalizedTaskId,
+    {
+      companyId,
+
+      contactId:
+        optionalText(formData, "contact_id"),
+
+      dealId:
+        optionalText(formData, "deal_id"),
+
+      activityId:
+        optionalText(formData, "activity_id"),
+
+      title,
+
+      description:
+        optionalText(formData, "description"),
+
+      status: statusValue,
+      priority: priorityValue,
+
+      dueAt:
+        optionalText(formData, "due_at"),
+
+      ownerName:
+        optionalText(formData, "owner_name"),
+    },
+  );
+
+  revalidatePath("/tasks");
+  revalidatePath("/");
+  revalidatePath(
+    `/companies/${task.company_id}`,
+  );
+
+  redirect("/tasks");
+}
+
 export async function completeTaskAction(
   taskId: string,
 ): Promise<void> {
+  await requirePermission("task.complete");
+
   const normalizedTaskId = taskId.trim();
 
   if (!normalizedTaskId) {

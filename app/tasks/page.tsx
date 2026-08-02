@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { hasPermission, requirePermission } from "@/modules/auth";
+
 import {
   SalesSidebar,
 } from "@/components/layout/SalesSidebar";
@@ -7,6 +9,8 @@ import {
 import {
   DatabaseStatus,
 } from "@/components/ui/DatabaseStatus";
+
+import { TaskEditModal } from "@/components/tasks/TaskEditModal";
 
 import {
   completeTaskAction,
@@ -53,6 +57,16 @@ function formatDate(value: string | null) {
 }
 
 export default async function TasksPage() {
+  await requirePermission("task.read");
+
+  const canCreateTasks =
+    await hasPermission("task.create");
+
+  const canCompleteTasks =
+    await hasPermission("task.complete");
+
+  const canEditTasks =
+    await hasPermission("task.update");
   const [
     tasks,
     metrics,
@@ -256,7 +270,18 @@ export default async function TasksPage() {
                               "Ответственный не назначен"}
                           </span>
 
-                          {task.status !== "Done" &&
+                          {canEditTasks && (
+                            <TaskEditModal
+                              task={task}
+                              companies={options.companies}
+                              contacts={options.contacts}
+                              deals={options.deals}
+                              activities={options.activities}
+                            />
+                          )}
+
+                          {canCompleteTasks &&
+                            task.status !== "Done" &&
                             task.status !== "Cancelled" && (
                               <form
                                 action={completeTaskAction.bind(
@@ -281,7 +306,8 @@ export default async function TasksPage() {
             )}
           </section>
 
-          <aside className="createPanel">
+          {canCreateTasks && (
+<aside className="createPanel">
             <div className="formHeader">
               <div className="formIcon">＋</div>
 
@@ -496,6 +522,7 @@ export default async function TasksPage() {
               </form>
             )}
           </aside>
+          )}
         </section>
       </main>
     </div>

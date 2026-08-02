@@ -5,6 +5,7 @@ import type {
   SalesTask,
   TaskPriority,
   TaskStatus,
+  UpdateTaskInput,
 } from "@/types/task";
 
 const taskSelect = `
@@ -100,6 +101,148 @@ export async function listTasks(
   );
 
   return result.rows;
+}
+
+export async function getTaskById(
+  taskId: string,
+): Promise<SalesTask | null> {
+  const normalizedTaskId = taskId.trim();
+
+  if (!normalizedTaskId) {
+    return null;
+  }
+
+  const result =
+    await getDb().query<SalesTask>(
+      `
+        ${taskSelect}
+
+        WHERE task.id = $1
+
+        LIMIT 1
+      `,
+      [normalizedTaskId],
+    );
+
+  return result.rows[0] ?? null;
+}
+
+export async function updateTask(
+  taskId: string,
+  input: UpdateTaskInput,
+): Promise<SalesTask> {
+  const normalizedTaskId = taskId.trim();
+
+  if (!normalizedTaskId) {
+    throw new Error(
+      "Не указан идентификатор задачи.",
+    );
+  }
+
+  const result = await getDb().query<{
+    id: string;
+  }>(
+    `
+      UPDATE sales.tasks
+
+      SET
+        company_id = $2,
+        contact_id = $3,
+        deal_id = $4,
+        activity_id = $5,
+
+        title = $6,
+        description = $7,
+
+        status = $8,
+        priority = $9,
+
+        due_at = $10,
+
+        completed_at =
+          CASE
+            WHEN $8 = 'Done'
+              THEN COALESCE(
+                completed_at,
+                NOW()
+              )
+            ELSE NULL
+          END,
+
+        owner_name = $11,
+        updated_at = NOW()
+
+      WHERE id = $1
+
+        AND (
+          $3::UUID IS NULL
+          OR EXISTS (
+            SELECT 1
+            FROM sales.contacts AS contact
+            WHERE contact.id = $3::UUID
+              AND contact.company_id = $2::UUID
+          )
+        )
+
+        AND (
+          $4::UUID IS NULL
+          OR EXISTS (
+            SELECT 1
+            FROM sales.deals AS deal
+            WHERE deal.id = $4::UUID
+              AND deal.company_id = $2::UUID
+          )
+        )
+
+        AND (
+          $5::UUID IS NULL
+          OR EXISTS (
+            SELECT 1
+            FROM sales.activities AS activity
+            WHERE activity.id = $5::UUID
+              AND activity.company_id = $2::UUID
+              AND activity.deleted_at IS NULL
+          )
+        )
+
+      RETURNING id
+    `,
+    [
+      normalizedTaskId,
+
+      input.companyId,
+      input.contactId,
+      input.dealId,
+      input.activityId,
+
+      input.title,
+      input.description,
+
+      input.status,
+      input.priority,
+
+      input.dueAt,
+      input.ownerName,
+    ],
+  );
+
+  if (!result.rows[0]) {
+    throw new Error(
+      "Задача не найдена или выбранные связанные " +
+        "объекты не принадлежат компании.",
+    );
+  }
+
+  const updatedTask =
+    await getTaskById(normalizedTaskId);
+
+  if (!updatedTask) {
+    throw new Error(
+      "Не удалось загрузить обновлённую задачу.",
+    );
+  }
+
+  return updatedTask;
 }
 
 export async function listCompanyTasks(
