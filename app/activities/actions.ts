@@ -11,6 +11,7 @@ import {
   isActivityPriority,
   isActivityStatus,
   isActivityType,
+  updateActivity,
 } from "@/lib/repositories/activity.repository";
 
 function requiredText(
@@ -184,4 +185,123 @@ export async function completeActivityAction(
       `/companies/${activity.company_id}`,
     );
   }
+}
+
+export async function updateActivityAction(
+  activityId: string,
+  formData: FormData,
+): Promise<void> {
+  await requirePermission("activity.update");
+
+  const normalizedActivityId =
+    activityId.trim();
+
+  if (!normalizedActivityId) {
+    throw new Error(
+      "Не указан идентификатор активности.",
+    );
+  }
+
+  const companyId = requiredText(
+    formData,
+    "company_id",
+    "Компания",
+  );
+
+  const activityTypeValue = requiredText(
+    formData,
+    "activity_type",
+    "Тип активности",
+  );
+
+  if (!isActivityType(activityTypeValue)) {
+    throw new Error(
+      "Указан неизвестный тип активности.",
+    );
+  }
+
+  const subject = requiredText(
+    formData,
+    "subject",
+    "Тема активности",
+  );
+
+  const statusValue = requiredText(
+    formData,
+    "status",
+    "Статус",
+  );
+
+  if (!isActivityStatus(statusValue)) {
+    throw new Error(
+      "Указан неизвестный статус активности.",
+    );
+  }
+
+  const priorityValue = requiredText(
+    formData,
+    "priority",
+    "Приоритет",
+  );
+
+  if (!isActivityPriority(priorityValue)) {
+    throw new Error(
+      "Указан неизвестный приоритет.",
+    );
+  }
+
+  const contactId = optionalText(
+    formData,
+    "contact_id",
+  );
+
+  const dealId = optionalText(
+    formData,
+    "deal_id",
+  );
+
+  const scheduledAt = optionalText(
+    formData,
+    "scheduled_at",
+  );
+
+  const ownerName = optionalText(
+    formData,
+    "owner_name",
+  );
+
+  const description = optionalText(
+    formData,
+    "description",
+  );
+
+  const outcome = optionalText(
+    formData,
+    "outcome",
+  );
+
+  const activity = await updateActivity(
+    normalizedActivityId,
+    {
+      companyId,
+      contactId,
+      dealId,
+      activityType: activityTypeValue,
+      subject,
+      status: statusValue,
+      priority: priorityValue,
+      scheduledAt,
+      ownerName,
+      description,
+      outcome,
+    },
+  );
+
+  revalidatePath("/activities");
+  revalidatePath(
+    `/companies/${activity.company_id}`,
+  );
+  revalidatePath(
+    `/activities/${activity.id}/edit`,
+  );
 }
