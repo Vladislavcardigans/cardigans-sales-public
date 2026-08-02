@@ -80,6 +80,24 @@ export type CreateActivityInput = {
   outcome: string | null;
 };
 
+export type UpdateActivityInput = {
+  companyId: string;
+  contactId: string | null;
+  dealId: string | null;
+
+  activityType: ActivityType;
+  subject: string;
+
+  status: ActivityStatus;
+  priority: ActivityPriority;
+
+  scheduledAt: string | null;
+  ownerName: string | null;
+
+  description: string | null;
+  outcome: string | null;
+};
+
 export type ActivityCompanyOption = {
   id: string;
   display_name: string;

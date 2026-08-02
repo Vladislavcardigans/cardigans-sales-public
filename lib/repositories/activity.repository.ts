@@ -9,6 +9,7 @@ import type {
   ActivityStatus,
   ActivityType,
   CreateActivityInput,
+  UpdateActivityInput,
 } from "@/types/activity";
 
 const activitySelect = `
@@ -101,6 +102,151 @@ export async function listActivities(
   );
 
   return result.rows;
+}
+
+export async function getActivityById(
+  activityId: string,
+): Promise<Activity | null> {
+  const normalizedActivityId =
+    activityId.trim();
+
+  if (!normalizedActivityId) {
+    return null;
+  }
+
+  const result =
+    await getDb().query<Activity>(
+      `
+        ${activitySelect}
+
+        WHERE activity.id = $1
+
+        LIMIT 1
+      `,
+      [normalizedActivityId],
+    );
+
+  return result.rows[0] ?? null;
+}
+
+export async function updateActivity(
+  activityId: string,
+  input: UpdateActivityInput,
+): Promise<Activity> {
+  const normalizedActivityId =
+    activityId.trim();
+
+  if (!normalizedActivityId) {
+    throw new Error(
+      "Не указан идентификатор активности.",
+    );
+  }
+
+  const result = await getDb().query<{
+    id: string;
+  }>(
+    `
+      UPDATE sales.activities
+
+      SET
+        company_id = $2,
+        contact_id = $3,
+        deal_id = $4,
+
+        activity_type = $5,
+        subject = $6,
+
+        status = $7,
+        priority = $8,
+
+        scheduled_at = $9,
+
+        completed_at =
+          CASE
+            WHEN $7 = 'Completed'
+              THEN COALESCE(
+                completed_at,
+                NOW()
+              )
+            ELSE NULL
+          END,
+
+        owner_name = $10,
+        description = $11,
+        outcome = $12,
+
+        updated_at = NOW()
+
+      WHERE id = $1
+
+        AND (
+          $3::UUID IS NULL
+
+          OR EXISTS (
+            SELECT 1
+            FROM sales.contacts AS contact
+
+            WHERE contact.id = $3::UUID
+              AND contact.company_id =
+                $2::UUID
+          )
+        )
+
+        AND (
+          $4::UUID IS NULL
+
+          OR EXISTS (
+            SELECT 1
+            FROM sales.deals AS deal
+
+            WHERE deal.id = $4::UUID
+              AND deal.company_id =
+                $2::UUID
+          )
+        )
+
+      RETURNING id
+    `,
+    [
+      normalizedActivityId,
+
+      input.companyId,
+      input.contactId,
+      input.dealId,
+
+      input.activityType,
+      input.subject,
+
+      input.status,
+      input.priority,
+
+      input.scheduledAt,
+
+      input.ownerName,
+      input.description,
+      input.outcome,
+    ],
+  );
+
+  if (!result.rows[0]) {
+    throw new Error(
+      "Активность не найдена или выбранные " +
+        "контакт и сделка не принадлежат компании.",
+    );
+  }
+
+  const updatedActivity =
+    await getActivityById(
+      normalizedActivityId,
+    );
+
+  if (!updatedActivity) {
+    throw new Error(
+      "Не удалось загрузить обновлённую активность.",
+    );
+  }
+
+  return updatedActivity;
 }
 
 export async function listCompanyActivities(
