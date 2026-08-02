@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import {
+  deleteTaskAction,
   updateTaskAction,
 } from "@/app/tasks/actions";
 
@@ -31,6 +32,7 @@ type TaskEditModalProps = {
   contacts: TaskOption[];
   deals: TaskOption[];
   activities: TaskOption[];
+  canDelete: boolean;
 };
 
 const statusNames: Record<string, string> = {
@@ -74,6 +76,7 @@ export function TaskEditModal({
   contacts,
   deals,
   activities,
+  canDelete,
 }: TaskEditModalProps) {
   const dialogRef =
     useRef<HTMLDialogElement>(null);
@@ -366,6 +369,33 @@ export function TaskEditModal({
             </button>
           </div>
         </form>
+
+        {canDelete && (
+          <form
+            action={deleteTaskAction.bind(
+              null,
+              task.id,
+            )}
+            className={styles.deleteForm}
+            onSubmit={(event) => {
+              const confirmed = window.confirm(
+                `Удалить задачу «${task.title}»? ` +
+                  "Она будет перемещена в корзину.",
+              );
+
+              if (!confirmed) {
+                event.preventDefault();
+              }
+            }}
+          >
+            <button
+              type="submit"
+              className={styles.deleteButton}
+            >
+              Удалить задачу
+            </button>
+          </form>
+        )}
       </dialog>
     </>
   );

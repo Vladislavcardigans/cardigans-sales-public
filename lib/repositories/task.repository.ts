@@ -77,6 +77,8 @@ export async function listTasks(
     `
       ${taskSelect}
 
+      WHERE task.deleted_at IS NULL
+
       ORDER BY
         CASE task.status
           WHEN 'Todo' THEN 1
@@ -118,6 +120,7 @@ export async function getTaskById(
         ${taskSelect}
 
         WHERE task.id = $1
+          AND task.deleted_at IS NULL
 
         LIMIT 1
       `,
@@ -173,6 +176,7 @@ export async function updateTask(
         updated_at = NOW()
 
       WHERE id = $1
+        AND deleted_at IS NULL
 
         AND (
           $3::UUID IS NULL
@@ -245,6 +249,52 @@ export async function updateTask(
   return updatedTask;
 }
 
+export async function deleteTask(
+  taskId: string,
+): Promise<{
+  id: string;
+  company_id: string;
+}> {
+  const normalizedTaskId = taskId.trim();
+
+  if (!normalizedTaskId) {
+    throw new Error(
+      "Не указан идентификатор задачи.",
+    );
+  }
+
+  const result = await getDb().query<{
+    id: string;
+    company_id: string;
+  }>(
+    `
+      UPDATE sales.tasks
+
+      SET
+        deleted_at = NOW(),
+        updated_at = NOW()
+
+      WHERE id = $1
+        AND deleted_at IS NULL
+
+      RETURNING
+        id,
+        company_id
+    `,
+    [normalizedTaskId],
+  );
+
+  const deletedTask = result.rows[0];
+
+  if (!deletedTask) {
+    throw new Error(
+      "Задача не найдена или уже удалена.",
+    );
+  }
+
+  return deletedTask;
+}
+
 export async function listCompanyTasks(
   companyId: string,
   limit = 50,
@@ -259,6 +309,7 @@ export async function listCompanyTasks(
       ${taskSelect}
 
       WHERE task.company_id = $1
+        AND task.deleted_at IS NULL
 
       ORDER BY
         CASE task.status
@@ -430,6 +481,7 @@ export async function getTaskMetrics(): Promise<{
       )::TEXT AS done
 
     FROM sales.tasks
+    WHERE deleted_at IS NULL
   `);
 
   const row = result.rows[0];

@@ -8,6 +8,7 @@ import { getDb } from "@/lib/db";
 
 import {
   createTask,
+  deleteTask,
   updateTask,
   isTaskPriority,
   isTaskStatus,
@@ -225,6 +226,7 @@ export async function completeTaskAction(
         updated_at = NOW()
 
       WHERE id = $1
+        AND deleted_at IS NULL
         AND status NOT IN (
           'Done',
           'Cancelled'
@@ -247,4 +249,21 @@ export async function completeTaskAction(
       `/companies/${task.company_id}`,
     );
   }
+}
+
+export async function deleteTaskAction(
+  taskId: string,
+): Promise<void> {
+  await requirePermission("task.delete");
+
+  const deletedTask =
+    await deleteTask(taskId);
+
+  revalidatePath("/tasks");
+  revalidatePath("/");
+  revalidatePath(
+    `/companies/${deletedTask.company_id}`,
+  );
+
+  redirect("/tasks");
 }

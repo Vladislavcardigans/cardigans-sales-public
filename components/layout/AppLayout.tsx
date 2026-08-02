@@ -88,6 +88,28 @@ export async function AppLayout({
           </div>
 
           <div className="appTopbarRight">
+            <form
+              action="/search"
+              method="get"
+              className="globalSearchForm"
+            >
+              <span
+                className="globalSearchIcon"
+                aria-hidden="true"
+              >
+                ⌕
+              </span>
+
+              <input
+                type="search"
+                name="q"
+                placeholder="Поиск по CRM..."
+                minLength={2}
+                maxLength={100}
+                aria-label="Поиск по CRM"
+              />
+            </form>
+
             {topbarRight ?? <DatabaseStatus />}
 
             <Link

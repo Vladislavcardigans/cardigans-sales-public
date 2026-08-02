@@ -67,6 +67,9 @@ export default async function TasksPage() {
 
   const canEditTasks =
     await hasPermission("task.update");
+
+  const canDeleteTasks =
+    await hasPermission("task.delete");
   const [
     tasks,
     metrics,
@@ -277,6 +280,7 @@ export default async function TasksPage() {
                               contacts={options.contacts}
                               deals={options.deals}
                               activities={options.activities}
+                              canDelete={canDeleteTasks}
                             />
                           )}
 
