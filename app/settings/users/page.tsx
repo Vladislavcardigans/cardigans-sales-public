@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   AppLayout,
 } from "@/components/layout/AppLayout";
@@ -105,9 +106,32 @@ export default async function UsersPage() {
             </p>
           </div>
 
-          <span className="usersCount">
-            {users.length}
-          </span>
+          <div className="usersHeaderActions">
+            <nav className="settingsNavigation">
+              <Link
+                href="/settings/users"
+                className="settingsNavigationActive"
+              >
+                Пользователи
+              </Link>
+
+              <Link href="/settings/system">
+                Система
+              </Link>
+
+              <Link href="/settings/audit">
+                Аудит
+              </Link>
+
+              <Link href="/settings/trash">
+                Корзина
+              </Link>
+            </nav>
+
+            <span className="usersCount">
+              {users.length}
+            </span>
+          </div>
         </header>
 
         <div className="usersWorkspace">

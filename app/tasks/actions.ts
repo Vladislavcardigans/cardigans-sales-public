@@ -7,6 +7,10 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 
 import {
+  createAuditEvent,
+} from "@/lib/repositories/audit.repository";
+
+import {
   createTask,
   deleteTask,
   updateTask,
@@ -41,10 +45,45 @@ function optionalText(
   return value || null;
 }
 
+async function getTaskAuditIdentity(
+  taskId: string,
+): Promise<{
+  task_code: string | null;
+  title: string | null;
+  company_id: string | null;
+}> {
+  const result = await getDb().query<{
+    task_code: string | null;
+    title: string | null;
+    company_id: string | null;
+  }>(
+    `
+      SELECT
+        task_code,
+        title,
+        company_id
+
+      FROM sales.tasks
+
+      WHERE id = $1
+
+      LIMIT 1
+    `,
+    [taskId],
+  );
+
+  return result.rows[0] ?? {
+    task_code: null,
+    title: null,
+    company_id: null,
+  };
+}
+
 export async function createTaskAction(
   formData: FormData,
 ): Promise<void> {
-  await requirePermission("task.create");
+  const session =
+    await requirePermission("task.create");
 
   const companyId = requiredText(
     formData,
@@ -68,7 +107,7 @@ export async function createTaskAction(
       formData.get("priority") ?? "Normal",
     ).trim();
 
-  await createTask({
+  const task = await createTask({
     companyId,
 
     contactId:
@@ -102,6 +141,24 @@ export async function createTaskAction(
       optionalText(formData, "owner_name"),
   });
 
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "create",
+    entityType: "task",
+    entityId: task.id,
+
+    entityCode: task.task_code,
+    entityTitle: task.title,
+
+    details: {
+      companyId: task.company_id,
+      status: task.status,
+      priority: task.priority,
+    },
+  });
+
   revalidatePath("/tasks");
   revalidatePath(
     `/companies/${companyId}`,
@@ -112,7 +169,8 @@ export async function updateTaskAction(
   taskId: string,
   formData: FormData,
 ): Promise<void> {
-  await requirePermission("task.update");
+  const session =
+    await requirePermission("task.update");
 
   const normalizedTaskId = taskId.trim();
 
@@ -188,6 +246,25 @@ export async function updateTaskAction(
     },
   );
 
+  const auditIdentity =
+    await getTaskAuditIdentity(task.id);
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "update",
+    entityType: "task",
+    entityId: task.id,
+
+    entityCode: auditIdentity.task_code,
+    entityTitle: auditIdentity.title,
+
+    details: {
+      companyId: auditIdentity.company_id,
+    },
+  });
+
   revalidatePath("/tasks");
   revalidatePath("/");
   revalidatePath(
@@ -200,7 +277,8 @@ export async function updateTaskAction(
 export async function completeTaskAction(
   taskId: string,
 ): Promise<void> {
-  await requirePermission("task.complete");
+  const session =
+    await requirePermission("task.complete");
 
   const normalizedTaskId = taskId.trim();
 
@@ -241,6 +319,26 @@ export async function completeTaskAction(
 
   const task = result.rows[0];
 
+  const auditIdentity =
+    await getTaskAuditIdentity(task.id);
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "complete",
+    entityType: "task",
+    entityId: task.id,
+
+    entityCode: auditIdentity.task_code,
+    entityTitle: auditIdentity.title,
+
+    details: {
+      companyId: auditIdentity.company_id,
+      status: "Done",
+    },
+  });
+
   revalidatePath("/tasks");
   revalidatePath("/");
 
@@ -254,10 +352,33 @@ export async function completeTaskAction(
 export async function deleteTaskAction(
   taskId: string,
 ): Promise<void> {
-  await requirePermission("task.delete");
+  const session =
+    await requirePermission("task.delete");
 
   const deletedTask =
     await deleteTask(taskId);
+
+  const auditIdentity =
+    await getTaskAuditIdentity(
+      deletedTask.id,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "delete",
+    entityType: "task",
+    entityId: deletedTask.id,
+
+    entityCode: auditIdentity.task_code,
+    entityTitle: auditIdentity.title,
+
+    details: {
+      companyId: deletedTask.company_id,
+      softDelete: true,
+    },
+  });
 
   revalidatePath("/tasks");
   revalidatePath("/");

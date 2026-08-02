@@ -1,14 +1,7 @@
+import { AppLayout } from "@/components/layout/AppLayout";
 import Link from "next/link";
 
 import { hasPermission, requirePermission } from "@/modules/auth";
-
-import {
-  SalesSidebar,
-} from "@/components/layout/SalesSidebar";
-
-import {
-  DatabaseStatus,
-} from "@/components/ui/DatabaseStatus";
 
 import { TaskEditModal } from "@/components/tasks/TaskEditModal";
 
@@ -81,19 +74,18 @@ export default async function TasksPage() {
   ]);
 
   return (
-    <div className="appShell">
-      <SalesSidebar activeSection="tasks" />
-
-      <main className="mainContent">
-        <header className="topbar">
-          <div className="breadcrumbs">
-            <span>Продажи</span>
-            <strong>/</strong>
-            <span>Задачи</span>
-          </div>
-
-          <DatabaseStatus />
-        </header>
+    <AppLayout
+      activeSection="tasks"
+      breadcrumbs={[
+        {
+          label: "Sales OS",
+          href: "/",
+        },
+        {
+          label: "Задачи",
+        },
+      ]}
+    >
 
         <section className="pageHeader">
           <div>
@@ -528,7 +520,6 @@ export default async function TasksPage() {
           </aside>
           )}
         </section>
-      </main>
-    </div>
+    </AppLayout>
   );
 }

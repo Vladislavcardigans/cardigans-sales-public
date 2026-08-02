@@ -57,6 +57,76 @@ function isManagedRoleCode(
   );
 }
 
+async function ensureNotLastActiveAdmin(
+  client: PoolClient,
+  tenantId: string,
+  userId: string,
+): Promise<void> {
+  const targetResult = await client.query<{
+    is_active_admin: boolean;
+  }>(
+    `
+      SELECT EXISTS (
+        SELECT 1
+
+        FROM sales.users AS users
+
+        INNER JOIN sales.user_roles
+          ON user_roles.user_id = users.id
+
+        INNER JOIN sales.roles
+          ON roles.id = user_roles.role_id
+
+        WHERE users.id = $1
+          AND users.tenant_id = $2
+          AND users.status = 'Active'
+          AND roles.role_code = 'Admin'
+      ) AS is_active_admin
+    `,
+    [userId, tenantId],
+  );
+
+  if (!targetResult.rows[0]?.is_active_admin) {
+    return;
+  }
+
+  const otherAdminsResult =
+    await client.query<{
+      total: string;
+    }>(
+      `
+        SELECT COUNT(
+          DISTINCT users.id
+        )::TEXT AS total
+
+        FROM sales.users AS users
+
+        INNER JOIN sales.user_roles
+          ON user_roles.user_id = users.id
+
+        INNER JOIN sales.roles
+          ON roles.id = user_roles.role_id
+
+        WHERE users.tenant_id = $1
+          AND users.id <> $2
+          AND users.status = 'Active'
+          AND roles.role_code = 'Admin'
+      `,
+      [tenantId, userId],
+    );
+
+  const otherAdmins = Number(
+    otherAdminsResult.rows[0]?.total ?? 0,
+  );
+
+  if (otherAdmins === 0) {
+    throw new Error(
+      "Нельзя отключить или понизить роль " +
+        "последнего активного администратора.",
+    );
+  }
+}
+
 async function getRoleId(
   client: PoolClient,
   roleCode: ManagedRoleCode,
@@ -283,6 +353,14 @@ export async function updateManagedUserRole(
       roleCode,
     );
 
+    if (roleCode !== "Admin") {
+      await ensureNotLastActiveAdmin(
+        client,
+        tenantId,
+        userId,
+      );
+    }
+
     const userResult = await client.query(
       `
         SELECT id
@@ -341,39 +419,66 @@ export async function setManagedUserStatus(
     "Active" | "Disabled"
   >,
 ): Promise<void> {
-  const result = await getDb().query(
-    `
-      UPDATE sales.users
-      SET
-        status = $3,
-        updated_at = NOW()
-      WHERE id = $1
-        AND tenant_id = $2
-      RETURNING id
-    `,
-    [
-      userId,
-      tenantId,
-      status,
-    ],
-  );
+  const pool = getDb();
+  const client = await pool.connect();
 
-  if (!result.rows[0]) {
-    throw new Error(
-      "Пользователь не найден.",
-    );
-  }
+  try {
+    await client.query("BEGIN");
 
-  if (status === "Disabled") {
-    await getDb().query(
+    if (status === "Disabled") {
+      await ensureNotLastActiveAdmin(
+        client,
+        tenantId,
+        userId,
+      );
+    }
+
+    const result = await client.query(
       `
-        UPDATE sales.sessions
-        SET revoked_at = NOW()
-        WHERE user_id = $1
-          AND revoked_at IS NULL
+        UPDATE sales.users
+
+        SET
+          status = $3,
+          updated_at = NOW()
+
+        WHERE id = $1
+          AND tenant_id = $2
+
+        RETURNING id
       `,
-      [userId],
+      [
+        userId,
+        tenantId,
+        status,
+      ],
     );
+
+    if (!result.rows[0]) {
+      throw new Error(
+        "Пользователь не найден.",
+      );
+    }
+
+    if (status === "Disabled") {
+      await client.query(
+        `
+          UPDATE sales.sessions
+
+          SET revoked_at = NOW()
+
+          WHERE user_id = $1
+            AND revoked_at IS NULL
+        `,
+        [userId],
+      );
+    }
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
 }
 

@@ -9,6 +9,12 @@ import {
 } from "@/modules/auth";
 
 import {
+  createAuditEvent,
+} from "@/lib/repositories/audit.repository";
+
+import { getDb } from "@/lib/db";
+
+import {
   createManagedUser,
   managedRoleCodes,
   resetManagedUserPassword,
@@ -51,13 +57,61 @@ function parseRoleCode(
   return value as ManagedRoleCode;
 }
 
+async function getUserAuditIdentity(
+  tenantId: string,
+  userId: string,
+): Promise<{
+  email: string | null;
+  display_name: string | null;
+  status: string | null;
+  role_code: string | null;
+}> {
+  const result = await getDb().query<{
+    email: string | null;
+    display_name: string | null;
+    status: string | null;
+    role_code: string | null;
+  }>(
+    `
+      SELECT
+        users.email,
+        users.display_name,
+        users.status,
+        roles.role_code
+
+      FROM sales.users AS users
+
+      LEFT JOIN sales.user_roles
+        ON user_roles.user_id = users.id
+
+      LEFT JOIN sales.roles
+        ON roles.id = user_roles.role_id
+
+      WHERE users.id = $1
+        AND users.tenant_id = $2
+
+      ORDER BY roles.role_code
+      LIMIT 1
+    `,
+    [userId, tenantId],
+  );
+
+  return result.rows[0] ?? {
+    email: null,
+    display_name: null,
+    status: null,
+    role_code: null,
+  };
+}
+
 export async function createUserAction(
   formData: FormData,
 ): Promise<void> {
   const session =
     await requirePermission("user.manage");
 
-  await createManagedUser({
+  const userId =
+    await createManagedUser({
     tenantId: session.user.tenantId,
     assignedBy: session.user.id,
 
@@ -88,6 +142,29 @@ export async function createUserAction(
     ),
   });
 
+  const createdUser =
+    await getUserAuditIdentity(
+      session.user.tenantId,
+      userId,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "create",
+    entityType: "user",
+    entityId: userId,
+
+    entityCode: createdUser.email,
+    entityTitle: createdUser.display_name,
+
+    details: {
+      roleCode: createdUser.role_code,
+      status: createdUser.status,
+    },
+  });
+
   revalidatePath("/settings/users");
 }
 
@@ -110,6 +187,28 @@ export async function updateUserRoleAction(
     ),
     session.user.id,
   );
+
+  const updatedUser =
+    await getUserAuditIdentity(
+      session.user.tenantId,
+      userId,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "role_change",
+    entityType: "user",
+    entityId: userId,
+
+    entityCode: updatedUser.email,
+    entityTitle: updatedUser.display_name,
+
+    details: {
+      roleCode: updatedUser.role_code,
+    },
+  });
 
   revalidatePath("/settings/users");
 }
@@ -136,6 +235,28 @@ export async function toggleUserStatusAction(
     nextStatus,
   );
 
+  const updatedUser =
+    await getUserAuditIdentity(
+      session.user.tenantId,
+      userId,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "status_change",
+    entityType: "user",
+    entityId: userId,
+
+    entityCode: updatedUser.email,
+    entityTitle: updatedUser.display_name,
+
+    details: {
+      status: updatedUser.status,
+    },
+  });
+
   revalidatePath("/settings/users");
 }
 
@@ -155,6 +276,28 @@ export async function resetUserPasswordAction(
       "Новый пароль",
     ),
   );
+
+  const updatedUser =
+    await getUserAuditIdentity(
+      session.user.tenantId,
+      userId,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "password_reset",
+    entityType: "user",
+    entityId: userId,
+
+    entityCode: updatedUser.email,
+    entityTitle: updatedUser.display_name,
+
+    details: {
+      sessionsRevoked: true,
+    },
+  });
 
   revalidatePath("/settings/users");
 }

@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 
 import { getDb } from "@/lib/db";
 
+import {
+  createAuditEvent,
+} from "@/lib/repositories/audit.repository";
+
 import { requirePermission } from "@/modules/auth";
 
 import {
@@ -43,10 +47,45 @@ function optionalText(
   return value || null;
 }
 
+async function getActivityAuditIdentity(
+  activityId: string,
+): Promise<{
+  activity_code: string | null;
+  subject: string | null;
+  company_id: string | null;
+}> {
+  const result = await getDb().query<{
+    activity_code: string | null;
+    subject: string | null;
+    company_id: string | null;
+  }>(
+    `
+      SELECT
+        activity_code,
+        subject,
+        company_id
+
+      FROM sales.activities
+
+      WHERE id = $1
+
+      LIMIT 1
+    `,
+    [activityId],
+  );
+
+  return result.rows[0] ?? {
+    activity_code: null,
+    subject: null,
+    company_id: null,
+  };
+}
+
 export async function createActivityAction(
   formData: FormData,
 ): Promise<void> {
-  await requirePermission("activity.create");
+  const session =
+    await requirePermission("activity.create");
 
   const companyId = requiredText(
     formData,
@@ -75,7 +114,7 @@ export async function createActivityAction(
       formData.get("priority") ?? "Normal",
     ).trim();
 
-  await createActivity({
+  const activity = await createActivity({
     companyId,
 
     contactId:
@@ -132,6 +171,25 @@ export async function createActivityAction(
       ),
   });
 
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "create",
+    entityType: "activity",
+    entityId: activity.id,
+
+    entityCode: activity.activity_code,
+    entityTitle: activity.subject,
+
+    details: {
+      companyId: activity.company_id,
+      status: activity.status,
+      priority: activity.priority,
+      activityType: activity.activity_type,
+    },
+  });
+
   revalidatePath("/activities");
   revalidatePath(
     `/companies/${companyId}`,
@@ -141,7 +199,8 @@ export async function createActivityAction(
 export async function completeActivityAction(
   activityId: string,
 ): Promise<void> {
-  await requirePermission("activity.complete");
+  const session =
+    await requirePermission("activity.complete");
 
   const normalizedActivityId =
     activityId.trim();
@@ -179,6 +238,30 @@ export async function completeActivityAction(
 
   const activity = result.rows[0];
 
+  const auditIdentity =
+    await getActivityAuditIdentity(
+      activity.id,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "complete",
+    entityType: "activity",
+    entityId: activity.id,
+
+    entityCode:
+      auditIdentity.activity_code,
+    entityTitle: auditIdentity.subject,
+
+    details: {
+      companyId:
+        auditIdentity.company_id,
+      status: "Completed",
+    },
+  });
+
   revalidatePath("/activities");
   revalidatePath("/");
 
@@ -193,7 +276,8 @@ export async function updateActivityAction(
   activityId: string,
   formData: FormData,
 ): Promise<void> {
-  await requirePermission("activity.update");
+  const session =
+    await requirePermission("activity.update");
 
   const normalizedActivityId =
     activityId.trim();
@@ -299,6 +383,29 @@ export async function updateActivityAction(
     },
   );
 
+  const auditIdentity =
+    await getActivityAuditIdentity(
+      activity.id,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "update",
+    entityType: "activity",
+    entityId: activity.id,
+
+    entityCode:
+      auditIdentity.activity_code,
+    entityTitle: auditIdentity.subject,
+
+    details: {
+      companyId:
+        auditIdentity.company_id,
+    },
+  });
+
   revalidatePath("/activities");
   revalidatePath(
     `/companies/${activity.company_id}`,
@@ -313,10 +420,35 @@ export async function updateActivityAction(
 export async function deleteActivityAction(
   activityId: string,
 ): Promise<void> {
-  await requirePermission("activity.delete");
+  const session =
+    await requirePermission("activity.delete");
 
   const deletedActivity =
     await deleteActivity(activityId);
+
+  const auditIdentity =
+    await getActivityAuditIdentity(
+      deletedActivity.id,
+    );
+
+  await createAuditEvent({
+    tenantId: session.user.tenantId,
+    userId: session.user.id,
+
+    action: "delete",
+    entityType: "activity",
+    entityId: deletedActivity.id,
+
+    entityCode:
+      auditIdentity.activity_code,
+    entityTitle: auditIdentity.subject,
+
+    details: {
+      companyId:
+        deletedActivity.company_id,
+      softDelete: true,
+    },
+  });
 
   revalidatePath("/activities");
   revalidatePath("/");

@@ -7,10 +7,12 @@ import {
 
 type SalesSidebarProps = {
   activeSection: SalesNavigationItem["section"];
+  showSettings?: boolean;
 };
 
 export function SalesSidebar({
   activeSection,
+  showSettings = false,
 }: SalesSidebarProps) {
   return (
     <aside className="sidebar">
@@ -29,7 +31,13 @@ export function SalesSidebar({
       </div>
 
       <nav className="navigation">
-        {salesNavigation.map((item) => {
+        {salesNavigation
+          .filter(
+            (item) =>
+              item.section !== "settings" ||
+              showSettings,
+          )
+          .map((item) => {
           const isPlaceholder =
             item.href === "#";
 

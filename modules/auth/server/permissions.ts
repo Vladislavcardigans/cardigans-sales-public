@@ -36,6 +36,10 @@ export const permissionCodes = [
 
   "analytics.read",
 
+  "audit.read",
+  "trash.manage",
+  "system.read",
+
   "settings.read",
   "settings.manage",
 

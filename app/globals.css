@@ -4816,3 +4816,471 @@ h1 {
     flex-direction: column;
   }
 }
+
+/* System status */
+
+.systemPage {
+  padding: 2rem;
+}
+
+.systemPageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.systemPageHeader h1 {
+  margin: 0.2rem 0 0.45rem;
+}
+
+.systemPageHeader p {
+  margin: 0;
+  color: #98a2b3;
+}
+
+.settingsNavigation {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border: 1px solid #253248;
+  border-radius: 11px;
+  background: #0c1524;
+}
+
+.settingsNavigation a {
+  padding: 0.55rem 0.8rem;
+  border-radius: 8px;
+  color: #98a2b3;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.settingsNavigation a:hover,
+.settingsNavigationActive {
+  background: #253248;
+  color: #ffffff !important;
+}
+
+.usersHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.systemHealthCard {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(18, 183, 106, 0.4);
+  border-radius: 13px;
+  background: rgba(18, 183, 106, 0.08);
+}
+
+.systemHealthIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #12b76a;
+  box-shadow: 0 0 0 6px rgba(18, 183, 106, 0.13);
+}
+
+.systemHealthCard div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.systemHealthCard small {
+  color: #98a2b3;
+}
+
+.systemMetricsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.systemMetricsGrid article {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid #253248;
+  border-radius: 12px;
+  background: #111b2b;
+}
+
+.systemMetricsGrid span {
+  color: #98a2b3;
+  font-size: 0.78rem;
+}
+
+.systemMetricsGrid strong {
+  font-size: 1.5rem;
+}
+
+.systemDetailsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.systemDetailCard {
+  padding: 1.1rem;
+  border: 1px solid #253248;
+  border-radius: 14px;
+  background: #111b2b;
+}
+
+.systemDetailCard header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.systemDetailCard h2 {
+  margin: 0.2rem 0 0;
+}
+
+.systemDetailCard dl {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.systemDetailCard dl div {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 1rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid #253248;
+}
+
+.systemDetailCard dt {
+  color: #667085;
+}
+
+.systemDetailCard dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.systemStatusSuccess,
+.systemStatusWarning {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.systemStatusSuccess {
+  background: rgba(18, 183, 106, 0.14);
+  color: #6ce9a6;
+}
+
+.systemStatusWarning {
+  background: rgba(247, 144, 9, 0.14);
+  color: #fec84b;
+}
+
+.systemBackupEmpty {
+  margin: 0;
+  color: #98a2b3;
+}
+
+@media (max-width: 1100px) {
+  .systemMetricsGrid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 750px) {
+  .systemPage {
+    padding: 1rem;
+  }
+
+  .systemPageHeader,
+  .usersPageHeader,
+  .usersHeaderActions {
+    flex-direction: column;
+  }
+
+  .systemDetailsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .systemMetricsGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Audit log */
+
+.auditPage {
+  padding: 2rem;
+}
+
+.auditPageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.auditPageHeader h1 {
+  margin: 0.2rem 0 0.45rem;
+}
+
+.auditPageHeader p {
+  margin: 0;
+  color: #98a2b3;
+}
+
+.auditList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.auditCard {
+  display: grid;
+  grid-template-columns:
+    110px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  border: 1px solid #253248;
+  border-radius: 13px;
+  background: #111b2b;
+}
+
+.auditAction {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.auditAction-create {
+  background: rgba(18, 183, 106, 0.14);
+  color: #6ce9a6;
+}
+
+.auditAction-update,
+.auditAction-move,
+.auditAction-role_change,
+.auditAction-status_change,
+.auditAction-password_reset {
+  background: rgba(46, 144, 250, 0.14);
+  color: #84caff;
+}
+
+.auditAction-complete,
+.auditAction-restore,
+.auditAction-login {
+  background: rgba(247, 144, 9, 0.14);
+  color: #fec84b;
+}
+
+.auditAction-delete {
+  background: rgba(240, 68, 56, 0.14);
+  color: #fda29b;
+}
+
+.auditContent {
+  min-width: 0;
+}
+
+.auditTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #98a2b3;
+  font-size: 0.78rem;
+}
+
+.auditTitleRow span {
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  background: #0c1524;
+}
+
+.auditContent h2 {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+}
+
+.auditActor,
+.auditDetails {
+  margin: 0.25rem 0 0;
+  color: #98a2b3;
+  font-size: 0.82rem;
+}
+
+.auditDetails {
+  overflow-wrap: anywhere;
+}
+
+.auditTime {
+  color: #667085;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.auditEmpty {
+  padding: 2rem;
+  border: 1px dashed #344054;
+  border-radius: 13px;
+  color: #98a2b3;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .auditPage {
+    padding: 1rem;
+  }
+
+  .auditPageHeader {
+    flex-direction: column;
+  }
+
+  .auditCard {
+    grid-template-columns: 1fr;
+  }
+
+  .auditTime {
+    white-space: normal;
+  }
+}
+
+/* Trash */
+
+.trashPage {
+  padding: 2rem;
+}
+
+.trashPageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.trashPageHeader h1 {
+  margin: 0.2rem 0 0.45rem;
+}
+
+.trashPageHeader p {
+  margin: 0;
+  color: #98a2b3;
+}
+
+.trashList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.trashCard {
+  display: grid;
+  grid-template-columns:
+    110px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #253248;
+  border-radius: 13px;
+  background: #111b2b;
+}
+
+.trashEntity {
+  width: fit-content;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(240, 68, 56, 0.14);
+  color: #fda29b;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.trashContent {
+  min-width: 0;
+}
+
+.trashContent h2 {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+}
+
+.trashContent p {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 0.82rem;
+}
+
+.trashMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  color: #98a2b3;
+  font-size: 0.76rem;
+}
+
+.trashMeta span {
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  background: #0c1524;
+}
+
+.trashRestoreButton {
+  min-height: 40px;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #12b76a;
+  border-radius: 9px;
+  background: transparent;
+  color: #6ce9a6;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trashRestoreButton:hover {
+  background: rgba(18, 183, 106, 0.12);
+}
+
+.trashEmpty {
+  padding: 2rem;
+  border: 1px dashed #344054;
+  border-radius: 13px;
+  color: #98a2b3;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .trashPage {
+    padding: 1rem;
+  }
+
+  .trashPageHeader {
+    flex-direction: column;
+  }
+
+  .trashCard {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,7 +1,6 @@
+import { AppLayout } from "@/components/layout/AppLayout";
 import Link from "next/link";
 
-import { SalesSidebar } from "@/components/layout/SalesSidebar";
-import { DatabaseStatus } from "@/components/ui/DatabaseStatus";
 import { ActivityEditModal } from "@/components/activities/ActivityEditModal";
 
 import {
@@ -206,21 +205,18 @@ export default async function ActivitiesPage() {
   ];
 
   return (
-    <div className="appShell">
-      <SalesSidebar
-        activeSection="activities"
-      />
-
-      <main className="mainContent">
-        <header className="topbar">
-          <div className="breadcrumbs">
-            <span>Продажи</span>
-            <strong>/</strong>
-            <span>Активности</span>
-          </div>
-
-          <DatabaseStatus />
-        </header>
+    <AppLayout
+      activeSection="activities"
+      breadcrumbs={[
+        {
+          label: "Sales OS",
+          href: "/",
+        },
+        {
+          label: "Активности",
+        },
+      ]}
+    >
 
         <section className="pageHeader">
           <div>
@@ -681,7 +677,6 @@ export default async function ActivitiesPage() {
             </aside>
           )}
         </section>
-      </main>
-    </div>
+    </AppLayout>
   );
 }

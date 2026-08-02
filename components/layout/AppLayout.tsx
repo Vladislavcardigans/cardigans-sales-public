@@ -62,10 +62,24 @@ export async function AppLayout({
   const [
     canReadTasks,
     canReadActivities,
+    canManageUsers,
+    canReadSystem,
+    canReadAudit,
+    canManageTrash,
   ] = await Promise.all([
     hasPermission("task.read"),
     hasPermission("activity.read"),
+    hasPermission("user.manage"),
+    hasPermission("system.read"),
+    hasPermission("audit.read"),
+    hasPermission("trash.manage"),
   ]);
+
+  const showSettings =
+    canManageUsers ||
+    canReadSystem ||
+    canReadAudit ||
+    canManageTrash;
 
   const notificationSummary =
     await getNotificationSummary({
@@ -78,6 +92,7 @@ export async function AppLayout({
     <div className="appShell">
       <SalesSidebar
         activeSection={activeSection}
+        showSettings={showSettings}
       />
 
       <main className="mainContent">
