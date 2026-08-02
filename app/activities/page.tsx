@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { SalesSidebar } from "@/components/layout/SalesSidebar";
 import { DatabaseStatus } from "@/components/ui/DatabaseStatus";
+import { ActivityEditModal } from "@/components/activities/ActivityEditModal";
 
 import {
   completeActivityAction,
@@ -126,6 +127,12 @@ export default async function ActivitiesPage() {
 
   const canCompleteActivities =
     await hasPermission("activity.complete");
+
+  const canEditActivities =
+    await hasPermission("activity.update");
+
+  const canDeleteActivities =
+    await hasPermission("activity.delete");
 
   const [
     activities,
@@ -402,7 +409,17 @@ export default async function ActivitiesPage() {
                                   "Ответственный не назначен"}
                               </span>
 
-                              {canCompleteActivities && activity.status === "Planned" && (
+                              {canEditActivities && (
+              <ActivityEditModal
+                activity={activity}
+                companies={companies}
+                contacts={contacts}
+                deals={deals}
+                canDelete={canDeleteActivities}
+              />
+            )}
+
+            {canCompleteActivities && activity.status === "Planned" && (
                                 <form
                                   action={completeActivityAction.bind(
                                     null,

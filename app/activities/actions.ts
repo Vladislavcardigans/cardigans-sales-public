@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { getDb } from "@/lib/db";
 
@@ -8,6 +9,7 @@ import { requirePermission } from "@/modules/auth";
 
 import {
   createActivity,
+  deleteActivity,
   isActivityPriority,
   isActivityStatus,
   isActivityType,
@@ -304,4 +306,23 @@ export async function updateActivityAction(
   revalidatePath(
     `/activities/${activity.id}/edit`,
   );
+
+  redirect("/activities");
+}
+
+export async function deleteActivityAction(
+  activityId: string,
+): Promise<void> {
+  await requirePermission("activity.delete");
+
+  const deletedActivity =
+    await deleteActivity(activityId);
+
+  revalidatePath("/activities");
+  revalidatePath("/");
+  revalidatePath(
+    `/companies/${deletedActivity.company_id}`,
+  );
+
+  redirect("/activities");
 }

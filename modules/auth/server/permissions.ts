@@ -26,6 +26,7 @@ export const permissionCodes = [
   "activity.create",
   "activity.complete",
   "activity.update",
+  "activity.delete",
 
   "task.read",
   "task.create",

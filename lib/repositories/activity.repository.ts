@@ -79,6 +79,8 @@ export async function listActivities(
     `
       ${activitySelect}
 
+      WHERE activity.deleted_at IS NULL
+
       ORDER BY
         CASE activity.status
           WHEN 'Planned' THEN 1
@@ -120,6 +122,7 @@ export async function getActivityById(
         ${activitySelect}
 
         WHERE activity.id = $1
+          AND activity.deleted_at IS NULL
 
         LIMIT 1
       `,
@@ -249,6 +252,53 @@ export async function updateActivity(
   return updatedActivity;
 }
 
+export async function deleteActivity(
+  activityId: string,
+): Promise<{
+  id: string;
+  company_id: string;
+}> {
+  const normalizedActivityId =
+    activityId.trim();
+
+  if (!normalizedActivityId) {
+    throw new Error(
+      "Не указан идентификатор активности.",
+    );
+  }
+
+  const result = await getDb().query<{
+    id: string;
+    company_id: string;
+  }>(
+    `
+      UPDATE sales.activities
+
+      SET
+        deleted_at = NOW(),
+        updated_at = NOW()
+
+      WHERE id = $1
+        AND deleted_at IS NULL
+
+      RETURNING
+        id,
+        company_id
+    `,
+    [normalizedActivityId],
+  );
+
+  const deletedActivity = result.rows[0];
+
+  if (!deletedActivity) {
+    throw new Error(
+      "Активность не найдена или уже удалена.",
+    );
+  }
+
+  return deletedActivity;
+}
+
 export async function listCompanyActivities(
   companyId: string,
   limit = 50,
@@ -263,6 +313,7 @@ export async function listCompanyActivities(
       ${activitySelect}
 
       WHERE activity.company_id = $1
+          AND activity.deleted_at IS NULL
 
       ORDER BY
         activity.scheduled_at DESC NULLS LAST,
